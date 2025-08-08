@@ -1,5 +1,5 @@
 # Streamlit
-streamlit run src/front.py
+streamlit run main.py
 
 # LangSmith (Observability)
 # Supabase (Vector Store)
