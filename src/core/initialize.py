@@ -35,7 +35,7 @@ def initialize_rag_components():
             query_name="match_documents"
         )
         logger.info("Supabase vector store initialized.")
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.0)
         logger.info("ChatOpenAI model initialized.")
         return vector_store, llm, supabase
     except Exception as e:
