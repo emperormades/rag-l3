@@ -1,10 +1,10 @@
 import streamlit as st
 
-from src.auth import authenticate_user, logout_user
-from src.initialize import initialize_rag_components
-from src.rag import create_rag_chain, query_rag
-from src.supabase_utils import save_conversation, load_conversations
-from src.translations import (
+from src.auth.authentication import authenticate_user, logout_user
+from src.core.initialize import initialize_rag_components
+from src.core.rag import create_rag_chain, query_rag
+from src.database.supabase_utils import save_conversation, load_conversations
+from src.core.translations import (
     is_english,
     is_portuguese,
     translate_to_english,

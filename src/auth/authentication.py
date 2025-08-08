@@ -1,7 +1,7 @@
 import streamlit as st
 from supabase.client import Client
 
-from src.log import logger
+from src.log.log import logger
 
 
 def authenticate_user(supabase: Client, email: str, password: str, is_signup: bool):

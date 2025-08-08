@@ -5,8 +5,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, List
 
-from src.log import logger
-from src.promp_template import prompt_template_v2
+from src.log.log import logger
+from src.core.promp_template import prompt_template_v2
 
 
 # Define the state for the graph

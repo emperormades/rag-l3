@@ -1,7 +1,7 @@
 from deep_translator import GoogleTranslator
 from langdetect import detect
 
-from src.log import logger
+from src.log.log import logger
 
 def is_portuguese(text):
     try:

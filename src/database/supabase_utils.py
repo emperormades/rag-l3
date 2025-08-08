@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from supabase.client import Client
-from src.log import logger
+from src.log.log import logger
 
 def save_conversation(
     supabase_client: Client,

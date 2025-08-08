@@ -5,7 +5,7 @@ from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from supabase.client import create_client, Client
 
-from src.log import logger
+from src.log.log import logger
 
 
 def validate_environment_variables():

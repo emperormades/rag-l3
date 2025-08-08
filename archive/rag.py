@@ -2,8 +2,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from src.log import logger
-from src.promp_template import prompt_template_v2
+from src.log.log import logger
+from src.core.promp_template import prompt_template_v2
 
 
 def create_rag_chain(vector_store, llm):
