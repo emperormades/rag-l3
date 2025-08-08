@@ -5,6 +5,7 @@ langchain
 langchain-community
 langchain-openai
 langdetect
+langgraph
 pypdf
 streamlit
 supabase

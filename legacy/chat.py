@@ -1,10 +1,9 @@
-from langchain_core.messages import AIMessage, HumanMessage
 import streamlit as st
 
 from src.auth import authenticate_user, logout_user
 from src.initialize import initialize_rag_components
 from src.rag import create_rag_chain, query_rag
-from src.supabase_utils import load_conversations, save_conversation
+from src.supabase_utils import save_conversation, load_conversations
 from src.translations import (
     is_english,
     is_portuguese,
@@ -16,9 +15,7 @@ def main():
     """Main function to run the Streamlit RAG application."""
     st.set_page_config(page_title="RAG Chatbot", page_icon="🧠", layout="wide")
     st.title("L3 Chatbot")
-    st.markdown("Ask questions based on the document: Which Economic Tasks are Performed with AI? Evidence from Millions of Claude Conversations")
-
-    # Initialize session state variables
+    st.markdown("Ask questions based on document: Which Economic Tasks are Performed with AI? Evidence from Millions of Claude Conversations")
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
     if "user_email" not in st.session_state:
@@ -31,8 +28,6 @@ def main():
         st.session_state["supabase_client"] = None
     if "rag_chain" not in st.session_state:
         st.session_state["rag_chain"] = None
-
-    # Initialize RAG components if they don't exist
     if st.session_state["supabase_client"] is None or st.session_state["rag_chain"] is None:
         try:
             vector_store, llm, supabase_client = initialize_rag_components()
@@ -44,13 +39,11 @@ def main():
         except Exception as e:
             st.error(f"Initialization Error: {e}")
             return
-
     supabase_client = st.session_state["supabase_client"]
     rag_chain = st.session_state["rag_chain"]
-
-    # Authentication UI
     if not st.session_state["logged_in"]:
         st.subheader("Login / Sign Up")
+        # Envolver toda a seção de login/signup em uma coluna de 30%
         col1, col2 = st.columns([0.3, 0.7])
         with col1:
             auth_tab = st.tabs(["Login", "Sign Up"])
@@ -70,8 +63,8 @@ def main():
                                 st.session_state["messages"] = []
                                 loaded_convs = load_conversations(supabase_client, st.session_state["user_id"])
                                 for conv in loaded_convs:
-                                    st.session_state["messages"].append(HumanMessage(content=conv["question"]))
-                                    st.session_state["messages"].append(AIMessage(content=conv["response"]))
+                                    st.session_state["messages"].append({"role": "user", "content": conv["question"]})
+                                    st.session_state["messages"].append({"role": "assistant", "content": conv["response"]})
                                 st.rerun()
                             else:
                                 st.error("Login failed. Please check your credentials.")
@@ -96,7 +89,6 @@ def main():
                         except Exception as e:
                             st.error(f"Sign up error: {e}")
     else:
-        # Chat UI
         st.sidebar.write(f"Logged in as: **{st.session_state['user_email']}**")
         if st.sidebar.button("Logout"):
             logout_user(supabase_client)
@@ -106,40 +98,30 @@ def main():
             st.session_state["messages"] = []
             st.success("Logged out successfully.")
             st.rerun()
-
         for msg in st.session_state["messages"]:
-            with st.chat_message(msg.type):
-                st.write(msg.content)
-
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
         question = st.chat_input("Enter your question:")
         if question:
-            st.session_state["messages"].append(HumanMessage(content=question))
+            st.session_state["messages"].append({"role": "user", "content": question})
             with st.chat_message("user"):
                 st.write(question)
-
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    # Use the full chat history for context
-                    chat_history = st.session_state["messages"]
-
                     if is_portuguese(question):
                         translated_question = translate_to_english(question)
-                        response_dict = query_rag(rag_chain, translated_question, chat_history)
+                        response_dict = query_rag(rag_chain, translated_question)
                     else:
-                        response_dict = query_rag(rag_chain, question, chat_history)
-
+                        response_dict = query_rag(rag_chain, question)
                     answer = response_dict.get("answer", "No answer found.")
                     context_text = response_dict.get("context", "")
                     doc_ids_list = response_dict.get("doc_ids", [])
-
                     if is_english(answer) and is_portuguese(question):
                         translated_answer = translate_to_portuguese(answer)
                         st.write(translated_answer)
-                        st.session_state["messages"].append(AIMessage(content=translated_answer))
                     else:
                         st.write(answer)
-                        st.session_state["messages"].append(AIMessage(content=answer))
-
+                    st.session_state["messages"].append({"role": "assistant", "content": answer})
                     if st.session_state["user_id"]:
                         save_conversation(
                             supabase_client,
@@ -150,4 +132,4 @@ def main():
                             doc_ids_list
                         )
                     else:
-                        st.warning("You are not logged in. The conversation will not be saved.")
+                        st.warning("You are not logged in. Conversation will not be saved.")
