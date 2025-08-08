@@ -1,0 +1,10 @@
+deep-translator
+dotenv
+langchain[openai]
+langchain
+langchain-community
+langchain-openai
+langdetect
+pypdf
+streamlit
+supabase
